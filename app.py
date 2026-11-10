@@ -1,12 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-app_path = "/content/drive/MyDrive/Vision2030_Project/app.py"
-
-new_code = r'''
-import streamlit as st
-import pandas as pd
-
 st.set_page_config(
     page_title="منصة ذكاء الأعمال لمؤشرات رؤية السعودية 2030",
     layout="wide"
