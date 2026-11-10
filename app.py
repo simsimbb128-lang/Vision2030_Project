@@ -1,4 +1,9 @@
+import streamlit as st
+import pandas as pd
 
+app_path = "/content/drive/MyDrive/Vision2030_Project/app.py"
+
+new_code = r'''
 import streamlit as st
 import pandas as pd
 
@@ -10,64 +15,57 @@ st.set_page_config(
 # تحميل البيانات
 df = pd.read_csv("vision2030_bi_data.csv")
 
-# حساب نسبة الإنجاز إذا لم تكن موجودة في ملف البيانات
+# حساب نسبة الإنجاز إذا لم تكن موجودة
 if "نسبة_الإنجاز" not in df.columns:
     df["نسبة_الإنجاز"] = (
         df["القيمة"] / df["المستهدف_2030"] * 100
     )
 
-
 # تنسيق الصفحة بالعربي
 st.markdown("""
 <style>
-    .main {
-        direction: rtl;
-        text-align: right;
-    }
-
-    h1 {
-        text-align: center;
-        font-size: 38px !important;
-        margin-bottom: 10px;
-    }
-
-    h3 {
-        text-align: center;
-        color: #315B75;
-        margin-bottom: 35px;
-    }
-
-    .kpi-card {
-        background: linear-gradient(135deg, #F4F8FA, #E7F2F7);
-        padding: 25px 15px;
-        border-radius: 18px;
-        text-align: center;
-        border: 1px solid #D7E5EC;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        min-height: 145px;
-    }
-
-    .kpi-title {
-        font-size: 17px;
-        color: #315B75;
-        font-weight: bold;
-        margin-bottom: 15px;
-    }
-
-    .kpi-value {
-        font-size: 36px;
-        font-weight: bold;
-        color: #173F5F;
-    }
-
-    .section-title {
-        text-align: right;
-        color: #173F5F;
-        font-size: 24px;
-        font-weight: bold;
-        margin-top: 40px;
-        margin-bottom: 20px;
-    }
+.main {
+    direction: rtl;
+    text-align: right;
+}
+h1 {
+    text-align: center;
+    font-size: 38px !important;
+    margin-bottom: 10px;
+}
+h3 {
+    text-align: center;
+    color: #315B75;
+    margin-bottom: 35px;
+}
+.kpi-card {
+    background: linear-gradient(135deg, #F4F8FA, #E7F2F7);
+    padding: 25px 15px;
+    border-radius: 18px;
+    text-align: center;
+    border: 1px solid #D7E5EC;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    min-height: 145px;
+}
+.kpi-title {
+    font-size: 17px;
+    color: #315B75;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+.kpi-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: #173F5F;
+}
+.section-title {
+    text-align: right;
+    color: #173F5F;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -79,7 +77,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # فلتر المحور
 st.markdown(
     '<div class="section-title">تصفية البيانات حسب المحور</div>',
@@ -90,16 +87,12 @@ axis_options = ["جميع المحاور"] + sorted(
     df["المحور"].dropna().unique().tolist()
 )
 
-selected_axis = st.selectbox(
-    "اختر المحور:",
-    axis_options
-)
+selected_axis = st.selectbox("اختر المحور:", axis_options)
 
 if selected_axis == "جميع المحاور":
     filtered_df = df.copy()
 else:
     filtered_df = df[df["المحور"] == selected_axis].copy()
-
 
 # حساب المؤشرات حسب الفلتر
 total_indicators = len(filtered_df)
@@ -151,15 +144,44 @@ with col4:
     </div>
     """, unsafe_allow_html=True)
 
-# عنوان قسم البيانات
+# الرسم البياني
+st.markdown(
+    '<div class="section-title">مقارنة القيمة الحالية بالمستهدف لعام 2030</div>',
+    unsafe_allow_html=True
+)
+
+chart_df = filtered_df.dropna(
+    subset=["المستهدف_2030"]
+).set_index("المؤشر")[["القيمة", "المستهدف_2030"]]
+
+chart_df = filtered_df.set_index("المؤشر")[
+    ["القيمة", "المستهدف_2030"]
+]
+
+chart_df = chart_df.rename(columns={
+    "القيمة": "القيمة الحالية",
+    "المستهدف_2030": "المستهدف 2030"
+})
+
+if not chart_df.empty:
+    st.bar_chart(chart_df)
+else:
+    st.info("لا توجد بيانات متاحة لهذا المحور.")
+
+# عرض البيانات
 st.markdown(
     '<div class="section-title">بيانات مؤشرات رؤية السعودية 2030</div>',
     unsafe_allow_html=True
 )
 
-# عرض البيانات
 st.dataframe(
     filtered_df,
     use_container_width=True,
     hide_index=True
 )
+'''
+
+# حفظ الكود الجديد في Google Drive
+with open(app_path, "w", encoding="utf-8") as f:
+    f.write(new_code)
+    print("تم حفظ الكود الجديد في Google Drive بنجاح")
